@@ -26,6 +26,7 @@ jobs:
       - name: Update repodata
         run: |
           cd ${GITHUB_WORKSPACE}/repos
+          mkdir -p rpm/{7,8,9}/x86_64/
           createrepo --database rpm/7/x86_64/
           createrepo --database rpm/8/x86_64/
           createrepo --database rpm/9/x86_64/
