@@ -8,20 +8,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: 'rockylinux/rockylinux:8'
+      image: 'rockylinux/rockylinux:9'
       env:
         LANG: ja_JP.UTF-8
     steps:
       - name: Locale ja_JP.UTF-8
         run: dnf install -y glibc-locale-source glibc-langpack-en glibc-langpack-ja
 
-      - name: Install packaging dependencies for Rocky 8
-        run: dnf -y install git createrepo
+      - name: Install packaging dependencies for Rocky 9
+        run: dnf -y install git createrepo gpg rpm-sign
+
+      #- name: Configure GPG
+      #  run: |
+      #    mkdir -p ~/.gnupg/
+      #    echo -n "$GPG_SIGNING_KEY" | gpg --import
+      #  env:
+      #    GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+
+      - name: Create rpm-build environment.
+        run: |
+          echo '%debug_package %{nil}' >> ~/.rpmmacros
+          echo '%_signature gpg' >> ~/.rpmmacros
+          echo '%_gpg_name "Tsuyamax <3974168+tsuyamax@users.noreply.github.com>" >> ~/.rpmmacros
 
       - name: Checkout repos
         uses: actions/checkout@v3
         with:
           path: repos
+
+      #- name: Add sign to rpm
+      #  run: |
+      #    rpm --addsign rpm/{7,8,9}/x86_64/*.rpm
 
       - name: Update repodata
         run: |
