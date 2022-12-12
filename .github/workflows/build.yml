@@ -20,7 +20,7 @@ jobs:
 
       - name: Configure GPG
         run: |
-          echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
+          echo "GPG_TTY=${TTY}" >> $GITHUB_ENV
           eval $(gpg-agent --daemon --allow-preset-passphrase  --default-cache-ttl 43200)
           tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
           default-cache-ttl 43200
