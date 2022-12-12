@@ -22,9 +22,9 @@ jobs:
         run: |
           eval $(gpg-agent --daemon --allow-preset-passphrase  --default-cache-ttl 43200)
           tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
-default-cache-ttl 43200
-allow-preset-passphrase
-EOF
+          default-cache-ttl 43200
+          allow-preset-passphrase
+          EOF
           gpg-connect-agent 'RELOADAGENT' /bye
           gpg-connect-agent "PRESET_PASSPHRASE ${GPG_KEYGRIP} -1 ${GPG_PASSPHRASE}" /bye
           echo -n "$GPG_SIGNING_KEY" | gpg --batch --import
