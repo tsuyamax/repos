@@ -46,8 +46,9 @@ jobs:
 
       - name: Add sign to rpm
         run: |
+          cd ${GITHUB_WORKSPACE}/repos
           rpm --addsign rpm/{7,8,9}/x86_64/*.rpm
-          gpg --export --armor > ${GITHUB_WORKSPACE}/repos/rpm/RPM-GPG-KEY-TSUYAMAX
+          gpg --export --armor > rpm/RPM-GPG-KEY-TSUYAMAX
 
       - name: Update repodata
         run: |
