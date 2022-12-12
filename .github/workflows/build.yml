@@ -24,7 +24,7 @@ jobs:
           eval $(gpg-agent --daemon --allow-preset-passphrase  --default-cache-ttl 43200)
           tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
           default-cache-ttl 43200
-          pinentry-mode loopback
+          allow-loopback-pinentry
           allow-preset-passphrase
           EOF
           gpg-connect-agent 'RELOADAGENT' /bye
