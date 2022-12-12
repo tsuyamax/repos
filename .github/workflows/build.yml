@@ -21,7 +21,7 @@ jobs:
       - name: Configure GPG
         run: |
           # echo "GPG_TTY=${TTY}" >> $GITHUB_ENV
-          eval $(gpg-agent --daemon --allow-preset-passphrase  --default-cache-ttl 43200)
+          eval $(gpg-agent --daemon --allow-loopback-pinentry --allow-preset-passphrase --default-cache-ttl 43200)
           tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
           default-cache-ttl 43200
           allow-loopback-pinentry
@@ -52,7 +52,7 @@ jobs:
       - name: Add sign to rpm
         run: |
           cd ${GITHUB_WORKSPACE}/repos
-          rpm --addsign rpm/{7,8,9}/x86_64/Packages/*.rpm
+          rpm --define "_gpg_sign_cmd_extra_args --pinentry-mode loopback" -addsign rpm/{7,8,9}/x86_64/Packages/*.rpm
           gpg --export --armor > rpm/RPM-GPG-KEY-TSUYAMAX
 
       - name: Update repodata
