@@ -18,12 +18,20 @@ jobs:
       - name: Install packaging dependencies for Rocky 9
         run: dnf -y install git createrepo gpg rpm-sign
 
-      #- name: Configure GPG
-      #  run: |
-      #    mkdir -p ~/.gnupg/
-      #    echo -n "$GPG_SIGNING_KEY" | gpg --import
-      #  env:
-      #    GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+      - name: Configure GPG
+        run: |
+          eval $(gpg-agent --daemon --allow-preset-passphrase  --default-cache-ttl 43200)
+          tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
+default-cache-ttl 43200
+allow-preset-passphrase
+EOF
+          gpg-connect-agent 'RELOADAGENT' /bye
+          gpg-connect-agent "PRESET_PASSPHRASE ${GPG_KEYGRIP} -1 ${GPG_PASSPHRASE}" /bye
+          echo -n "$GPG_SIGNING_KEY" | gpg --batch --import
+        env:
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
 
       - name: Create rpm-build environment.
         run: |
@@ -36,9 +44,10 @@ jobs:
         with:
           path: repos
 
-      #- name: Add sign to rpm
-      #  run: |
-      #    rpm --addsign rpm/{7,8,9}/x86_64/*.rpm
+      - name: Add sign to rpm
+        run: |
+          rpm --addsign rpm/{7,8,9}/x86_64/*.rpm
+          gpg --export --armor > ${GITHUB_WORKSPACE}/repos/rpm/RPM-GPG-KEY-TSUYAMAX
 
       - name: Update repodata
         run: |
@@ -47,6 +56,13 @@ jobs:
           createrepo --database rpm/7/x86_64/
           createrepo --database rpm/8/x86_64/
           createrepo --database rpm/9/x86_64/
+
+      - name: Delete gpg key
+        run: |
+          gpg --batch --delete-secret-keys ${GPG_KEYGRIP}
+          gpg-connect-agent 'KILLAGENT' /bye
+        env:
+          GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
 
       - name: Commit updates
         run: |
