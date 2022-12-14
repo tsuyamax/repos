@@ -42,7 +42,7 @@ jobs:
         run: |
           echo '%debug_package %{nil}' >> ~/.rpmmacros
           echo '%_signature gpg' >> ~/.rpmmacros
-          echo '%_gpg_name "Tsuyamax <3974168+tsuyamax@users.noreply.github.com>' >> ~/.rpmmacros
+          echo '%_gpg_name Tsuyamax <3974168+tsuyamax@users.noreply.github.com>' >> ~/.rpmmacros
           echo '%__gpg_sign_cmd %{__gpg} gpg --no-verbose --batch --pinentry-mode loopback --digest-algo sha256 --no-secmem-warning -u "%{_gpg_name}" -sbo %{__signature_filename} %{__plaintext_filename}' >> ~/.rpmmacros
 
       - name: Checkout repos
