@@ -21,15 +21,20 @@ jobs:
       - name: Configure GPG
         run: |
           # echo "GPG_TTY=${TTY}" >> $GITHUB_ENV
-          eval $(gpg-agent --daemon --allow-loopback-pinentry --allow-preset-passphrase --default-cache-ttl 43200)
+          eval $(gpg-agent --daemon --allow-preset-passphrase --default-cache-ttl 43200)
+          #eval $(gpg-agent --daemon --allow-loopback-pinentry --allow-preset-passphrase --default-cache-ttl 43200)
           tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
           default-cache-ttl 43200
-          allow-loopback-pinentry
           allow-preset-passphrase
           EOF
-          tee ~/.gnupg/gpg.conf << 'EOF' > /dev/null
-          pinentry-mode loopback
-          EOF
+          #tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
+          #default-cache-ttl 43200
+          #allow-loopback-pinentry
+          #allow-preset-passphrase
+          #EOF
+          #tee ~/.gnupg/gpg.conf << 'EOF' > /dev/null
+          #pinentry-mode loopback
+          #EOF
           gpg-connect-agent 'RELOADAGENT' /bye
           gpg-connect-agent "PRESET_PASSPHRASE ${GPG_KEYGRIP} -1 ${GPG_PASSPHRASE}" /bye
           echo -n "$GPG_SIGNING_KEY" | gpg --batch --import
@@ -43,7 +48,7 @@ jobs:
           echo '%debug_package %{nil}' >> ~/.rpmmacros
           echo '%_signature gpg' >> ~/.rpmmacros
           echo '%_gpg_name Tsuyamax <3974168+tsuyamax@users.noreply.github.com>' >> ~/.rpmmacros
-          echo '%__gpg_sign_cmd %{__gpg} gpg --no-verbose --batch --pinentry-mode loopback --digest-algo sha256 --no-secmem-warning -u "%{_gpg_name}" -sbo %{__signature_filename} %{__plaintext_filename}' >> ~/.rpmmacros
+          echo '%__gpg_sign_cmd %{__gpg} gpg --no-verbose --batch --digest-algo sha256 --no-secmem-warning -u "%{_gpg_name}" -sbo %{__signature_filename} %{__plaintext_filename}' >> ~/.rpmmacros
 
       - name: Checkout repos
         uses: actions/checkout@v3
