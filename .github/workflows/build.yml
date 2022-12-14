@@ -22,19 +22,10 @@ jobs:
         run: |
           # echo "GPG_TTY=${TTY}" >> $GITHUB_ENV
           eval $(gpg-agent --daemon --allow-preset-passphrase --default-cache-ttl 43200)
-          #eval $(gpg-agent --daemon --allow-loopback-pinentry --allow-preset-passphrase --default-cache-ttl 43200)
           tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
           default-cache-ttl 43200
           allow-preset-passphrase
           EOF
-          #tee ~/.gnupg/gpg-agent.conf << 'EOF' > /dev/null
-          #default-cache-ttl 43200
-          #allow-loopback-pinentry
-          #allow-preset-passphrase
-          #EOF
-          #tee ~/.gnupg/gpg.conf << 'EOF' > /dev/null
-          #pinentry-mode loopback
-          #EOF
           gpg-connect-agent 'RELOADAGENT' /bye
           gpg-connect-agent "PRESET_PASSPHRASE ${GPG_KEYGRIP} -1 $(echo -n "${GPG_PASSPHRASE}" | hexdump -v -e '/1 "%02X"')" /bye
           echo -n "$GPG_SIGNING_KEY" | gpg --batch --import
@@ -46,8 +37,6 @@ jobs:
       - name: Create rpm-build environment.
         run: |
           echo '%debug_package %{nil}' >> ~/.rpmmacros
-          echo '%_signature gpg' >> ~/.rpmmacros
-          echo '%_gpg_name Tsuyamax <3974168+tsuyamax@users.noreply.github.com>' >> ~/.rpmmacros
 
       - name: Checkout repos
         uses: actions/checkout@v3
@@ -57,7 +46,12 @@ jobs:
       - name: Add sign to rpm
         run: |
           cd ${GITHUB_WORKSPACE}/repos
-          rpm --define "_gpg_sign_cmd_extra_args --batch --pinentry-mode loopback --passphrase ${GPG_PASSPHRASE}" --addsign rpm/{7,8,9}/x86_64/Packages/*.rpm
+          # rpm command don't aware gpg-agent.
+          rpm \
+          --define "_signature gpg" \
+          --define "_gpg_name Tsuyamax <3974168+tsuyamax@users.noreply.github.com>" \
+          --define "_gpg_sign_cmd_extra_args --batch --pinentry-mode loopback --passphrase ${GPG_PASSPHRASE}" \
+          --addsign rpm/{7,8,9}/x86_64/Packages/*.rpm
           gpg --export --armor > rpm/RPM-GPG-KEY-TSUYAMAX
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
