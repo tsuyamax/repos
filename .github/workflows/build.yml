@@ -16,7 +16,7 @@ jobs:
         run: dnf install -y glibc-locale-source glibc-langpack-en glibc-langpack-ja
 
       - name: Install packaging dependencies for Rocky 9
-        run: dnf -y install git createrepo gpg rpm-sign
+        run: dnf -y install git createrepo gnupg2 rpm-sign
 
       - name: Configure GPG
         run: |
