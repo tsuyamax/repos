@@ -30,6 +30,7 @@ jobs:
           gpg-connect-agent "PRESET_PASSPHRASE ${GPG_KEYGRIP} -1 $(echo -n "${GPG_PASSPHRASE}" | hexdump -v -e '/1 "%02X"')" /bye
           echo -n "$GPG_SIGNING_KEY" | gpg --batch --import
           FINGERPRINT=$(gpg --list-secret-keys --with-colons | grep "^fpr" | cut -d: -f10 | head -1)
+          echo "GPG_FINGERPRINT=${FINGERPRINT}" >> $GITHUB_ENV
           echo "$FINGERPRINT:6:" | gpg --import-ownertrust
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
@@ -68,9 +69,10 @@ jobs:
 
       - name: Delete gpg key
         run: |
-          gpg --show-keys --with-colons | grep "^fpr" | cut -d: -f10 | head -1 | \
-          xargs gpg --batch --delete-secret-keys
+          gpg --batch --delete-secret-keys $GPG_FINGERPRINT
           gpg-connect-agent 'KILLAGENT' /bye
+        env:
+          GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
 
       - name: Commit updates
         run: |
