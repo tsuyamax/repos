@@ -29,7 +29,8 @@ jobs:
           gpg-connect-agent 'RELOADAGENT' /bye
           gpg-connect-agent "PRESET_PASSPHRASE ${GPG_KEYGRIP} -1 $(echo -n "${GPG_PASSPHRASE}" | hexdump -v -e '/1 "%02X"')" /bye
           echo -n "$GPG_SIGNING_KEY" | gpg --batch --import
-          echo -n "$GPG_OWNERTRUST" | gpg --import-ownertrust
+          FINGERPRINT=$(gpg --show-keys --with-colons | grep "^fpr" | cut -d: -f10 | head -1)
+          echo "$FINGERPRINT:6:" | gpg --import-ownertrust
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
