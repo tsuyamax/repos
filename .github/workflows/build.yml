@@ -67,7 +67,7 @@ jobs:
       - name: Delete gpg key
         run: |
           gpg --show-keys --with-colons | grep "^fpr" | cut -d: -f10 | head -1 | \
-          xargs gpg --batch --delete-key
+          xargs gpg --batch --delete-secret-keys
           gpg-connect-agent 'KILLAGENT' /bye
 
       - name: Commit updates
