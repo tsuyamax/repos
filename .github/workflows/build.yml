@@ -54,7 +54,7 @@ jobs:
           --define "_signature gpg" \
           --define "_gpg_name Tsuyamax <3974168+tsuyamax@users.noreply.github.com>" \
           --define "_gpg_sign_cmd_extra_args --batch --pinentry-mode loopback --passphrase ${GPG_PASSPHRASE}" \
-          --addsign rpm/{8,9}/{x86_64,aarch64}/Packages/*.rpm
+          --addsign rpm/9/{x86_64,aarch64}/Packages/*.rpm
           gpg --export --armor > rpm/RPM-GPG-KEY-TSUYAMAX
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
