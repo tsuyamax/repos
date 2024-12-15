@@ -62,7 +62,7 @@ jobs:
       - name: Update repodata
         run: |
           cd ${GITHUB_WORKSPACE}/repos
-          mkdir -p rpm/{8,9}/x86_64/
+          mkdir -p rpm/{8,9}/{x86_64,aarch64}/
           createrepo --database rpm/8/x86_64/
           createrepo --database rpm/9/x86_64/
           createrepo --database rpm/9/aarch64/
